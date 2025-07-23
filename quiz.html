@@ -1,0 +1,191 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Simple Quiz App</title>
+<style>
+  body {
+    font-family: Arial, sans-serif;
+    background: #e3f2fd;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+    margin: 0;
+  }
+  .quiz-container {
+    background: white;
+    padding: 20px 30px;
+    border-radius: 8px;
+    box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+    max-width: 400px;
+    width: 100%;
+  }
+  h2 {
+    margin-bottom: 20px;
+    color: #0d47a1;
+  }
+  .question {
+    font-size: 1.2rem;
+    margin-bottom: 15px;
+  }
+  .options {
+    list-style: none;
+    padding: 0;
+  }
+  .options li {
+    margin-bottom: 10px;
+  }
+  .options button {
+    width: 100%;
+    padding: 10px;
+    background: #bbdefb;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 1rem;
+  }
+  .options button:hover {
+    background: #90caf9;
+  }
+  .options button.correct {
+    background: #4caf50;
+    color: white;
+  }
+  .options button.incorrect {
+    background: #f44336;
+    color: white;
+  }
+  .score-section {
+    text-align: center;
+    margin-top: 20px;
+    font-size: 1.25rem;
+    color: #0d47a1;
+  }
+  .reset-btn {
+    margin-top: 20px;
+    display: block;
+    width: 100%;
+    padding: 10px;
+    background: #1976d2;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+  }
+  .reset-btn:hover {
+    background: #1565c0;
+  }
+</style>
+</head>
+<body>
+
+<div class="quiz-container">
+  <h2>Simple Quiz App</h2>
+  <div id="quiz">
+    <div id="question" class="question"></div>
+    <ul id="options" class="options"></ul>
+    <div class="score-section" id="score-section" style="display:none;"></div>
+    <button class="reset-btn" id="reset-btn" style="display:none;">Restart Quiz</button>
+  </div>
+</div>
+
+<script>
+  const quizData = [
+    {
+      question: "What is the capital of France?",
+      options: ["Berlin", "Madrid", "Paris", "Lisbon"],
+      answer: "Paris"
+    },
+    {
+      question: "Which language runs in a web browser?",
+      options: ["Java", "C", "Python", "JavaScript"],
+      answer: "JavaScript"
+    },
+    {
+      question: "What does CSS stand for?",
+      options: ["Central Style Sheets", "Cascading Style Sheets", "Cascading Simple Sheets", "Cars SUVs Sailboats"],
+      answer: "Cascading Style Sheets"
+    },
+    {
+      question: "What year was JavaScript launched?",
+      options: ["1996", "1995", "1994", "None of the above"],
+      answer: "1995"
+    }
+  ];
+
+  let currentQuestionIndex = 0;
+  let score = 0;
+
+  const questionEl = document.getElementById('question');
+  const optionsEl = document.getElementById('options');
+  const scoreSection = document.getElementById('score-section');
+  const resetBtn = document.getElementById('reset-btn');
+
+  function loadQuestion() {
+    resetState();
+    let currentQuestion = quizData[currentQuestionIndex];
+    questionEl.textContent = currentQuestion.question;
+
+    currentQuestion.options.forEach(option => {
+      const button = document.createElement('button');
+      button.textContent = option;
+      button.addEventListener('click', () => selectAnswer(option));
+      optionsEl.appendChild(button);
+    });
+  }
+
+  function resetState() {
+    while (optionsEl.firstChild) {
+      optionsEl.removeChild(optionsEl.firstChild);
+    }
+    scoreSection.style.display = 'none';
+    resetBtn.style.display = 'none';
+  }
+
+  function selectAnswer(selected) {
+    let currentQuestion = quizData[currentQuestionIndex];
+    const buttons = optionsEl.querySelectorAll('button');
+    buttons.forEach(button => {
+      if(button.textContent === currentQuestion.answer) {
+        button.classList.add('correct');
+      }
+      if(button.textContent === selected && selected !== currentQuestion.answer) {
+        button.classList.add('incorrect');
+      }
+      button.disabled = true;
+    });
+
+    if(selected === currentQuestion.answer) {
+      score++;
+    }
+
+    setTimeout(() => {
+      currentQuestionIndex++;
+      if(currentQuestionIndex < quizData.length) {
+        loadQuestion();
+      } else {
+        showScore();
+      }
+    }, 1500);
+  }
+
+  function showScore() {
+    resetState();
+    scoreSection.style.display = 'block';
+    scoreSection.textContent = `You scored ${score} out of ${quizData.length}!`;
+    resetBtn.style.display = 'block';
+  }
+
+  resetBtn.addEventListener('click', () => {
+    currentQuestionIndex = 0;
+    score = 0;
+    loadQuestion();
+  });
+
+  loadQuestion();
+</script>
+
+</body>
+</html>
